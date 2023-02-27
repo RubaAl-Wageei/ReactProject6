@@ -1,6 +1,66 @@
-import React from 'react'
+import React from 'react';
+import { useEffect, useState} from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const EditProfile = () => {
+
+    const navigate = useNavigate()
+    const [inputs, setInputs]=useState({}); 
+    const [users, setUsers]=useState([]);
+
+    useEffect(()=>{
+        getUsers();
+    }, []);
+
+    const handleChange= (event)=>{
+
+        const name = event.target.name; // to get the name of the input
+        const value = event.target.value; // to get the value of the input 
+        
+        setInputs(values =>({...values, [name]: value})); // to set the values (the name of input then : the value of that input) to values
+    }  
+
+
+    const handleSubmit =(event)=>{
+        event.preventDefault(); // to prevent the page from refresh on submit
+
+        // console.log(inputs, "My inputs")
+    }
+
+    const getUsers = ()=>{
+
+        axios.get('http://localhost/ReactProject6/backend/theUsers.php/{$id}').then((response)=>{
+            // console.log(response.data); // to print the data from database in console
+            setUsers(response.data); // add data to my useState
+            console.log(response.data)
+        
+        })
+     }
+
+
+     const profile = () => {
+        for (const user of users) {
+            // console.log(inputs)
+            // console.log(users)
+          if (user.email === inputs.email && user.password === inputs.password && Object.entries(inputs.email).length > 0 && Object.entries(inputs.password).length > 0) {
+            console.log("Welcome User");
+            localStorage.setItem('id' , JSON.stringify(user.id))
+            localStorage.setItem('first_name' , JSON.stringify(user.first_name))
+            localStorage.setItem('last_name' , JSON.stringify(user.last_name))
+            localStorage.setItem('email' , JSON.stringify( user.email))
+            localStorage.setItem('password' , JSON.stringify( user.password))
+            localStorage.setItem('phone' , JSON.stringify( user.phone))
+            navigate('/EditProfile')
+
+            return; // Exit the loop once a matching user is found
+          }
+        }
+        document.getElementById('errorLog').innerHTML = "the password or email is wrong"
+        console.log("Not User !");
+      }
+
     return (
         <div>
           <meta charSet="utf-8" />
@@ -53,7 +113,7 @@ const EditProfile = () => {
                                 </div>
                                 </div>
                                 <div className="card-body">
-                                <form>
+                                <form  onSubmit={handleSubmit}>
                                     <div className="form-group row align-items-center">
                                     <div className="col-md-12">
                                         <div className="profile-img-edit">
@@ -68,78 +128,33 @@ const EditProfile = () => {
                                     <div className=" row align-items-center">
                                     <div className="form-group col-sm-6">
                                         <label htmlFor="fname" className="form-label">First Name:</label>
-                                        <input type="text" className="form-control" id="fname" placeholder="Bni" />
+                                        <input type="text" className="form-control" name='fname' value={inputs.first_name} id="fname"    onChange={handleChange}/>
                                     </div>
                                     <div className="form-group col-sm-6">
                                         <label htmlFor="lname" className="form-label">Last Name:</label>
-                                        <input type="text" className="form-control" id="lname" placeholder="Jhon" />
+                                        <input type="text" className="form-control" name='lname' value={inputs.last_name} id="lname"    onChange={handleChange}/>
                                     </div>
                                     <div className="form-group col-sm-6">
-                                        <label htmlFor="uname" className="form-label">User Name:</label>
-                                        <input type="text" className="form-control" id="uname" placeholder="Bni@01" />
+                                        <label htmlFor="uname" className="form-label">Email</label>
+                                        <input type="text" className="form-control" name='email' value={inputs.email} id="email"    onChange={handleChange}/>
                                     </div>
                                     <div className="form-group col-sm-6">
-                                        <label htmlFor="cname" className="form-label">City:</label>
-                                        <input type="text" className="form-control" id="cname" placeholder="Atlanta" />
+                                        <label htmlFor="cname" className="form-label">Password</label>
+                                        <input type="text" className="form-control" name='password' value={inputs.password} id="pass"    onChange={handleChange}/>
                                     </div>
+                                    
                                     <div className="form-group col-sm-6">
-                                        <label className="form-label d-block">Gender:</label>
-                                        <div className="form-check form-check-inline">
-                                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio10" defaultValue="option1" />
-                                        <label className="form-check-label" htmlFor="inlineRadio10"> Male</label>
-                                        </div>
-                                        <div className="form-check form-check-inline">
-                                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio11" defaultValue="option1" />
-                                        <label className="form-check-label" htmlFor="inlineRadio11">Female</label>
-                                        </div>
+                                        <label htmlFor="dob" className="form-label">Phone Number</label>
+                                        <input className="form-control" name='phone' value={inputs.phone} id="phone"    onChange={handleChange}/>
                                     </div>
-                                    <div className="form-group col-sm-6">
-                                        <label htmlFor="dob" className="form-label">Date Of Birth:</label>
-                                        <input className="form-control" id="dob" placeholder="1984-01-24" />
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
                                     </div>
-                                    <div className="form-group col-sm-6">
-                                        <label className="form-label">Marital Status:</label>
-                                        <select className="form-select" aria-label="Default select example">
-                                        <option selected>Single</option>
-                                        <option>Married</option>
-                                        <option>Widowed</option>
-                                        <option>Divorced</option>
-                                        <option>Separated </option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group col-sm-6">
-                                        <label className="form-label">Age:</label>
-                                        <select className="form-select" aria-label="Default select example 2">
-                                        <option>46-62</option>
-                                        <option>63 &gt; </option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group col-sm-6">
-                                        <label className="form-label">Country:</label>
-                                        <select className="form-select" aria-label="Default select example 3">
-                                        <option>Caneda</option>
-                                        <option>Noida</option>
-                                        <option selected>USA</option>
-                                        <option>India</option>
-                                        <option>Africa</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group col-sm-6">
-                                        <label className="form-label">State:</label>
-                                        <select className="form-select" aria-label="Default select example 4">
-                                        <option>California</option>
-                                        <option>Florida</option>
-                                        <option selected>Georgia</option>
-                                        <option>Connecticut</option>
-                                        <option>Louisiana</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group col-sm-12">
-                                        <label className="form-label">Address:</label>
-                                        <textarea className="form-control" name="address" rows={5} style={{lineHeight: '22px'}} defaultValue={"                                                37 Cardinal Lane\n                                                Petersburg, VA 23803\n                                                United States of America\n                                                Zip Code: 85001\n                                                "} />
-                                    </div>
-                                    </div>
-                                    <button type="submit" className="btn btn-primary me-2">Submit</button>
+                                    <button type="submit" className="btn btn-primary me-2" onClick={profile}>Submit</button>
                                     <button type="reset" className="btn bg-soft-danger">Cancle</button>
                                 </form>
                                 </div>
